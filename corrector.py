@@ -1,21 +1,19 @@
-import language_tool_python
-
-tool = language_tool_python.LanguageTool('en-US')
+from textblob import TextBlob
 
 def correct_text(text):
-    matches = tool.check(text)
-    corrected_text = language_tool_python.utils.correct(text, matches)
-    return corrected_text
-
+    return str(TextBlob(text).correct())
 
 def get_suggestions(text):
-    matches = tool.check(text)
+    original = text.split()
+    corrected = str(TextBlob(text).correct()).split()
+
     suggestions = []
 
-    for match in matches:
-        suggestions.append({
-            "error": text[match.offset : match.offset + match.error_length],
-            "suggestions": match.replacements
-        })
+    for i in range(min(len(original), len(corrected))):
+        if original[i] != corrected[i]:
+            suggestions.append({
+                "error": original[i],
+                "suggestions": corrected[i]
+            })
 
     return suggestions
